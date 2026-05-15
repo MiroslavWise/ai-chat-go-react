@@ -64,7 +64,7 @@ function FormSendMessage() {
         render={({ field, fieldState: { error } }) => (
           <Textarea
             placeholder="Send a message"
-            className="w-full h-full resize-none pr-24 pb-12 pl-24"
+            className="w-full h-full resize-none pr-24 pb-12 pl-24 text-xs leading-snug"
             {...field}
             aria-invalid={!!error}
           />
@@ -98,12 +98,12 @@ function FormSendMessage() {
         </Button>
       </div>
       {voiceNotice ? (
-        <p className="absolute left-4 right-24 bottom-14 text-sm text-muted-foreground" role="status">
+        <p className="absolute left-4 right-24 bottom-14 text-xs text-muted-foreground" role="status">
           {voiceNotice}
         </p>
       ) : null}
       {sendMessageMutation.isError ? (
-        <p className="absolute left-4 bottom-16 text-sm text-destructive" role="alert">
+        <p className="absolute left-4 bottom-16 text-xs text-destructive" role="alert">
           {sendMessageMutation.error instanceof Error ? sendMessageMutation.error.message : "Не удалось отправить сообщение"}
         </p>
       ) : null}
