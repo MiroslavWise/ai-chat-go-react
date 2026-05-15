@@ -12,7 +12,7 @@ import { queryKeys } from "~/lib/query-keys"
 import { useMobileMenu } from "~/provider/provider-mobile-menu"
 
 function ListChat() {
-  const { isOpen, toggle } = useMobileMenu()
+  const { isOpen, toggle, close } = useMobileMenu()
   const [chatId, setChatId] = useQueryState("chatId")
 
   const { data } = useQuery({
@@ -30,12 +30,29 @@ function ListChat() {
           isOpen ? "flex" : "hidden lg:flex",
         )}
       >
-        <Item className="w-full" onClick={() => setChatId(null)} variant="muted" size="sm">
+        <Item
+          className="w-full"
+          onClick={() => {
+            setChatId(null)
+            close()
+          }}
+          variant="muted"
+          size="sm"
+        >
           <span className={cn("text-xs font-medium", chatId === null ? "text-primary" : "text-muted-foreground")}>Новый чат</span>
         </Item>
         <Separator orientation="horizontal" className="w-[calc(100%+1rem)] -mx-2" />
         {chats.map(({ id, title }) => (
-          <Item className="w-full" key={id} onClick={() => setChatId(id)} variant="outline" size="sm">
+          <Item
+            className="w-full"
+            key={id}
+            onClick={() => {
+              setChatId(id)
+              close()
+            }}
+            variant="outline"
+            size="sm"
+          >
             <span className={cn("text-xs font-medium truncate", chatId === id ? "text-primary" : "text-muted-foreground")}>{title}</span>
           </Item>
         ))}
@@ -46,7 +63,7 @@ function ListChat() {
         aria-label="Открыть меню"
         title="Открыть меню"
         size="icon"
-        className="fixed top-2 left-2 z-50 border border-border/80 bg-card text-foreground shadow-lg ring-2 ring-background lg:hidden"
+        className="fixed top-2 left-2 z-110 border border-border/80 bg-card text-foreground shadow-lg ring-2 ring-background lg:hidden"
         onClick={toggle}
       >
         <Menu className="size-4" />
