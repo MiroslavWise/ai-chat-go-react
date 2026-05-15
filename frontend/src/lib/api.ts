@@ -1,3 +1,5 @@
+import { useAuthStore } from "~/stores/auth-store"
+
 const API_BASE = import.meta.env.VITE_API_URL ?? '/api'
 
 export type Chat = {
@@ -59,7 +61,16 @@ export async function issueToken(userId: string): Promise<{ token: string; user_
   })
 }
 
-export async function listChats(token: string): Promise<Chat[]> {
+const headerToken = () => {
+  const token = useAuthStore.getState().token
+  if (!token) {
+    throw new Error('No token found')
+  }
+  return token
+}
+
+export async function listChats(): Promise<Chat[]> {
+  const token = headerToken()
   return request('/chats', { token })
 }
 
@@ -74,15 +85,17 @@ export async function createChat(
   })
 }
 
-export async function listMessages(token: string, chatId: string): Promise<Message[]> {
+export async function listMessages(chatId: string): Promise<Message[]> {
+  const token = headerToken()
   return request(`/chats/${chatId}/messages`, { token })
 }
 
 export async function sendMessage(
-  token: string,
   chatId: string,
   content: string,
 ): Promise<{ message: Message }> {
+  const token = headerToken()
+
   return request(`/chats/${chatId}/messages`, {
     method: 'POST',
     token,

@@ -27,20 +27,49 @@ func loadEnv() {
 func main() {
 	loadEnv()
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		_, _ = w.Write([]byte("ok"))
+	})
+
+	if err := mountAPI(mux); err != nil {
+		log.Printf("api unavailable: %v", err)
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/health" {
+				return
+			}
+			handler.WriteError(w, http.StatusServiceUnavailable, err.Error())
+		})
+	}
+
+	root := middleware.CORS(mux)
+	log.Printf("listening on :%s", port)
+	if err := http.ListenAndServe(":"+port, root); err != nil {
+		log.Fatalf("server: %v", err)
+	}
+}
+
+func mountAPI(mux *http.ServeMux) error {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("config: %v", err)
+		return err
 	}
 
 	ctx := context.Background()
 	database, err := db.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("database: %v", err)
+		return err
 	}
-	defer database.Close()
 
 	if err := db.Migrate(ctx, database); err != nil {
-		log.Fatalf("migrate: %v", err)
+		database.Close()
+		return err
 	}
 
 	st := store.New(database.Pool)
@@ -50,11 +79,6 @@ func main() {
 	chatsHandler := handler.NewChatsHandler(st)
 	messagesHandler := handler.NewMessagesHandler(chatsHandler, st)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		_, _ = w.Write([]byte("ok"))
-	})
 	mux.HandleFunc("POST /auth/token", authHandler.IssueToken)
 
 	protected := middleware.RequireAuth(issuer)
@@ -63,7 +87,5 @@ func main() {
 	mux.Handle("GET /chats/{id}/messages", protected(http.HandlerFunc(messagesHandler.List)))
 	mux.Handle("POST /chats/{id}/messages", protected(http.HandlerFunc(messagesHandler.Create)))
 
-	root := middleware.CORS(mux)
-	log.Printf("listening on :%s", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, root))
+	return nil
 }
