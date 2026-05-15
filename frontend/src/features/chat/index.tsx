@@ -3,7 +3,7 @@ import FormSendMessage from "~/components/forms/form-send-message"
 
 function Chat() {
   return (
-    <section className="w-full h-screen overflow-hidden flex flex-col">
+    <section className="w-full h-full min-h-0 overflow-hidden flex flex-col">
       <ListMessages />
       <FormSendMessage />
     </section>

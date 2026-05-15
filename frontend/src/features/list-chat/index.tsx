@@ -6,12 +6,13 @@ import { Separator } from "~/components/ui/separator"
 
 import { cn } from "~/lib/utils"
 import { listChats } from "~/lib/api"
+import { queryKeys } from "~/lib/query-keys"
 
 function ListChat() {
   const [chatId, setChatId] = useQueryState("chatId")
 
   const { data } = useQuery({
-    queryKey: ["chats"],
+    queryKey: queryKeys.chats(),
     queryFn: () => listChats(),
   })
 

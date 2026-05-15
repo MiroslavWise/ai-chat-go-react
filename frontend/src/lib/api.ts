@@ -92,6 +92,10 @@ async function listChats(): Promise<Chat[]> {
   return request<Chat[]>('/chats', { token })
 }
 
+export function chatTitleFromContent(content: string): string {
+  return content.trim().slice(0, 20)
+}
+
 async function createChat(title?: string): Promise<Chat> {
   const token = headerToken()
   return request('/chats', {
