@@ -62,7 +62,7 @@ function ListMessages() {
   }
 
   return (
-    <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 py-2">
+    <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-2">
       {messages.length === 0 ? (
         <p className="py-8 text-center text-xs text-muted-foreground">Сообщений пока нет</p>
       ) : (
