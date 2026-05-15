@@ -93,7 +93,7 @@ export async function listMessages(chatId: string): Promise<Message[]> {
 export async function sendMessage(
   chatId: string,
   content: string,
-): Promise<{ message: Message }> {
+): Promise<{ message: Message; assistant?: Message }> {
   const token = headerToken()
 
   return request(`/chats/${chatId}/messages`, {

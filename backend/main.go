@@ -11,6 +11,7 @@ import (
 	"ai-chat/internal/config"
 	"ai-chat/internal/db"
 	"ai-chat/internal/handler"
+	"ai-chat/internal/llm"
 	"ai-chat/internal/middleware"
 	"ai-chat/internal/store"
 
@@ -77,7 +78,12 @@ func mountAPI(mux *http.ServeMux) error {
 
 	authHandler := handler.NewAuthHandler(st, issuer)
 	chatsHandler := handler.NewChatsHandler(st)
-	messagesHandler := handler.NewMessagesHandler(chatsHandler, st)
+
+	var deepseek *llm.Client
+	if cfg.DeepSeekAPIKey != "" {
+		deepseek = llm.NewClient(cfg.DeepSeekAPIKey, cfg.DeepSeekModel)
+	}
+	messagesHandler := handler.NewMessagesHandler(chatsHandler, st, deepseek, cfg.DeepSeekSystem)
 
 	mux.HandleFunc("POST /auth/token", authHandler.IssueToken)
 

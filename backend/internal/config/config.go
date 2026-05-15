@@ -8,10 +8,13 @@ import (
 )
 
 type Config struct {
-	DatabaseURL string
-	JWTSecret   []byte
-	JWTTTL      time.Duration
-	Port        string
+	DatabaseURL      string
+	JWTSecret        []byte
+	JWTTTL           time.Duration
+	Port             string
+	DeepSeekAPIKey   string
+	DeepSeekModel    string
+	DeepSeekSystem   string
 }
 
 func Load() (Config, error) {
@@ -42,10 +45,23 @@ func Load() (Config, error) {
 		port = "3000"
 	}
 
+	model := os.Getenv("DEEPSEEK_MODEL")
+	if model == "" {
+		model = "deepseek-v4-flash"
+	}
+
+	system := os.Getenv("DEEPSEEK_SYSTEM_PROMPT")
+	if system == "" {
+		system = "You are a helpful assistant."
+	}
+
 	return Config{
-		DatabaseURL: dbURL,
-		JWTSecret:   []byte(secret),
-		JWTTTL:      time.Duration(ttlHours) * time.Hour,
-		Port:        port,
+		DatabaseURL:    dbURL,
+		JWTSecret:      []byte(secret),
+		JWTTTL:         time.Duration(ttlHours) * time.Hour,
+		Port:           port,
+		DeepSeekAPIKey: os.Getenv("DEEPSEEK_API_KEY"),
+		DeepSeekModel:  model,
+		DeepSeekSystem: system,
 	}, nil
 }
