@@ -69,12 +69,12 @@ const headerToken = () => {
   return token
 }
 
-export async function listChats(): Promise<Chat[]> {
+async function listChats(): Promise<Chat[]> {
   const token = headerToken()
   return request('/chats', { token })
 }
 
-export async function createChat(
+async function createChat(
   token: string,
   title?: string,
 ): Promise<Chat> {
@@ -85,12 +85,12 @@ export async function createChat(
   })
 }
 
-export async function listMessages(chatId: string): Promise<Message[]> {
+async function listMessages(chatId: string): Promise<Message[]> {
   const token = headerToken()
   return request(`/chats/${chatId}/messages`, { token })
 }
 
-export async function sendMessage(
+async function sendMessage(
   chatId: string,
   content: string,
 ): Promise<{ message: Message; assistant?: Message }> {
@@ -103,4 +103,4 @@ export async function sendMessage(
   })
 }
 
-export { API_BASE }
+export { API_BASE, listChats, createChat, listMessages, sendMessage }
