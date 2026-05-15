@@ -1,11 +1,15 @@
 import { createRoot } from 'react-dom/client'
-import { NuqsAdapter } from 'nuqs/adapters/react'
+
+import App from '~/App.tsx'
+import ProviderAuth from '~/provider/provider-auth'
+import ProviderNuqs from '~/provider/provider-nuqs'
 
 import '~/index.css'
-import App from '~/App.tsx'
 
 createRoot(document.getElementById('root')!).render(
-    <NuqsAdapter>
+  <ProviderNuqs>
+    <ProviderAuth>
       <App />
-    </NuqsAdapter>
+    </ProviderAuth>
+  </ProviderNuqs>,
 )

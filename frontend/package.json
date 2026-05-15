@@ -7,12 +7,15 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "doc": "npx -y react-doctor@latest . --verbose"
   },
   "dependencies": {
     "nuqs": "^2.8.9",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "uuid": "^14.0.0",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
