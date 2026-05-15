@@ -64,7 +64,7 @@ function FormSendMessage() {
         render={({ field, fieldState: { error } }) => (
           <Textarea
             placeholder="Send a message"
-            className="w-full h-full resize-none pr-24 pb-12 pl-24 text-xs leading-snug"
+            className="w-full h-full resize-none pb-12 text-xs leading-snug"
             {...field}
             aria-invalid={!!error}
           />
