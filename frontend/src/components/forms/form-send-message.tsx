@@ -57,7 +57,7 @@ function FormSendMessage() {
   const voiceNotice = voiceInput.notice ?? voiceOutput.notice
 
   return (
-    <form onSubmit={onSubmit} className="w-full relative h-18 p-2 border-t border-border mt-auto">
+    <form onSubmit={onSubmit} className="w-full relative h-25 p-2 border-t border-border mt-auto">
       <Controller
         control={control}
         name="content"
@@ -107,14 +107,7 @@ function FormSendMessage() {
           {sendMessageMutation.error instanceof Error ? sendMessageMutation.error.message : "Не удалось отправить сообщение"}
         </p>
       ) : null}
-      <Button
-        disabled={isLoading}
-        variant="outline"
-        size="icon"
-        type="submit"
-        className="absolute right-4 bottom-4"
-        aria-label="Отправить"
-      >
+      <Button disabled={isLoading} variant="outline" size="icon" type="submit" className="absolute right-4 bottom-4" aria-label="Отправить">
         Отправить
       </Button>
     </form>
