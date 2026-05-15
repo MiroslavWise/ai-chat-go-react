@@ -16,14 +16,6 @@ function MessageBubble({ message }: { message: Message }) {
           isUser ? "border-primary/30 bg-primary text-primary-foreground" : "border-border bg-muted/60 text-foreground",
         )}
       >
-        <p
-          className={cn(
-            "mb-0.5 text-[0.65rem] font-medium uppercase tracking-wide",
-            isUser ? "text-primary-foreground/70" : "text-muted-foreground",
-          )}
-        >
-          {isUser ? "Вы" : "Ассистент"}
-        </p>
         <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
       </div>
     </article>

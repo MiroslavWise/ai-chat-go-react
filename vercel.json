@@ -3,13 +3,15 @@
   "experimentalServices": {
     "web": {
       "entrypoint": "frontend",
-      "routePrefix": "/",
+      "mount": "/",
       "framework": "vite"
     },
-    "api": {
-      "entrypoint": "backend",
-      "routePrefix": "/api",
-      "framework": "go"
+    "backend": {
+      "entrypoint": "backend/main.go",
+      "mount": "/api",
+      "framework": "go",
+      "memory": 1024,
+      "maxDuration": 60
     }
   }
 }
