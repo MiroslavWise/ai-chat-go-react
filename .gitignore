@@ -26,7 +26,27 @@ go.work.sum
 
 # env file
 .env
+.env.*
+
+# Vite / Node
+node_modules/
+frontend/dist/
+
+# Go build artifacts
+backend/server
+backend/*.exe
 
 # Editor/IDE
 # .idea/
 # .vscode/
+
+
+.history
+.history/*
+/.history
+/.history/*
+/frontend/.history
+/frontend/.history/*
+/backend/.history
+/backend/.history/*
+/backend/.history
