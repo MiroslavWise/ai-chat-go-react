@@ -18,6 +18,18 @@ export type Message = {
   created_at: string
 }
 
+/** Ответ POST /chats/:id/messages при отправке от пользователя */
+export type SendMessageResponse = {
+  message: Message
+  assistant: Message
+}
+
+export function messagesFromSendResponse(
+  response: SendMessageResponse,
+): Message[] {
+  return [response.message, response.assistant]
+}
+
 async function request<T>(
   path: string,
   init?: RequestInit & { token?: string },
@@ -77,13 +89,11 @@ const headerToken = () => {
 
 async function listChats(): Promise<Chat[]> {
   const token = headerToken()
-  return request('/chats', { token })
+  return request<Chat[]>('/chats', { token })
 }
 
-async function createChat(
-  token: string,
-  title?: string,
-): Promise<Chat> {
+async function createChat(title?: string): Promise<Chat> {
+  const token = headerToken()
   return request('/chats', {
     method: 'POST',
     token,
@@ -99,13 +109,13 @@ async function listMessages(chatId: string): Promise<Message[]> {
 async function sendMessage(
   chatId: string,
   content: string,
-): Promise<{ message: Message; assistant?: Message }> {
+): Promise<SendMessageResponse> {
   const token = headerToken()
 
   return request(`/chats/${chatId}/messages`, {
     method: 'POST',
     token,
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, role: 'user' }),
   })
 }
 
