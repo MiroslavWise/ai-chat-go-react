@@ -26,7 +26,7 @@ function ListChat() {
     <>
       <aside
         className={cn(
-          "w-full h-full absolute max-lg:inset-0 lg:relative lg:flex flex-col p-2 gap-1 lg:border-r lg:border-border",
+          "w-full h-full fixed z-100 max-lg:inset-0 lg:relative lg:flex flex-col p-2 gap-1 lg:border-r lg:border-border bg-(--bg)",
           isOpen ? "flex" : "hidden lg:flex",
         )}
       >
@@ -46,7 +46,7 @@ function ListChat() {
         aria-label="Открыть меню"
         title="Открыть меню"
         size="icon"
-        className="absolute top-2 left-2 z-50 border border-border/80 bg-card text-foreground shadow-lg ring-2 ring-background lg:hidden"
+        className="fixed top-2 left-2 z-50 border border-border/80 bg-card text-foreground shadow-lg ring-2 ring-background lg:hidden"
         onClick={toggle}
       >
         <Menu className="size-4" />
