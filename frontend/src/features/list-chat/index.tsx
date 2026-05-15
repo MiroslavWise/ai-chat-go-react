@@ -20,6 +20,11 @@ function ListChat() {
 
   return (
     <aside className="w-full h-full flex flex-col p-2 gap-1">
+      <Item className="w-full" onClick={() => setChatId(null)} variant="outline" size="sm">
+        <span className={cn("text-sm font-medium", chatId === null ? "text-primary" : "text-muted-foreground")}>
+          Новый чат
+        </span>
+      </Item>
       <Separator orientation="horizontal" className="w-full" />
       {chats.map(({ id, title }) => (
         <Item className="w-full" key={id} onClick={() => setChatId(id)} variant="outline" size="sm">

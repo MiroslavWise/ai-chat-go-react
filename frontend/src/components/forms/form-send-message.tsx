@@ -80,7 +80,7 @@ function FormSendMessage() {
           aria-pressed={voiceInput.listening}
           aria-label={voiceInput.listening ? "Остановить запись" : "Голосовой ввод"}
           title={voiceInput.listening ? "Остановить запись" : "Голосовой ввод"}
-          onClick={() => void voiceInput.toggleListening()}
+          onClick={() => voiceInput.toggleListening()}
         >
           {voiceInput.listening ? <Square /> : <Mic />}
         </Button>

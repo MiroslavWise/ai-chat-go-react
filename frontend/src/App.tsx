@@ -3,7 +3,7 @@ import ListChat from "./features/list-chat"
 
 function App() {
   return (
-    <main className="w-full h-screen overflow-hidden grid grid-cols-[10rem_minmax(0,1fr)] min-h-0">
+    <main className="w-full h-screen overflow-hidden grid grid-cols-[15rem_minmax(0,1fr)] min-h-0">
       <ListChat />
       <Chat />
     </main>

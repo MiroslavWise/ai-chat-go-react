@@ -1,12 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import {
-  createChat,
-  listMessages,
-  messagesFromSendResponse,
-  sendMessage,
-  type Chat,
-  type Message,
-} from '~/lib/api'
+import { useCallback, useEffect, useState } from "react"
+import { createChat, listMessages, messagesFromSendResponse, sendMessage, type Chat, type Message } from "~/lib/api"
 
 export function useActiveChat() {
   const [chat, setChat] = useState<Chat | null>(null)
@@ -14,16 +7,13 @@ export function useActiveChat() {
 
   useEffect(() => {
     let cancelled = false
-
-    void (async () => {
+    ;(async () => {
       try {
         const created = await createChat()
         if (!cancelled) setChat(created)
       } catch (err) {
         if (!cancelled) {
-          setBootError(
-            err instanceof Error ? err.message : 'Не удалось создать чат',
-          )
+          setBootError(err instanceof Error ? err.message : "Не удалось создать чат")
         }
       }
     })()
@@ -52,15 +42,13 @@ export function useChatMessages(chatId: string | null) {
     setLoading(true)
     setError(null)
 
-    void listMessages(chatId)
+    listMessages(chatId)
       .then((items) => {
         if (!cancelled) setMessages(items)
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : 'Не удалось загрузить сообщения',
-          )
+          setError(err instanceof Error ? err.message : "Не удалось загрузить сообщения")
         }
       })
       .finally(() => {
@@ -83,8 +71,7 @@ export function useChatMessages(chatId: string | null) {
         const response = await sendMessage(chatId, content)
         setMessages((prev) => [...prev, ...messagesFromSendResponse(response)])
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Не удалось отправить сообщение'
+        const message = err instanceof Error ? err.message : "Не удалось отправить сообщение"
         setError(message)
         throw err
       } finally {
