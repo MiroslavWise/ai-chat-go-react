@@ -78,6 +78,14 @@ func Load() (Config, error) {
 	if appTitle == "" {
 		appTitle = strings.TrimSpace(os.Getenv("OPENROUTER_APP_TITLE"))
 	}
+	if strings.Contains(strings.ToLower(baseURL), "openrouter.ai") {
+		if referer == "" {
+			referer = defaultOpenRouterReferer()
+		}
+		if appTitle == "" {
+			appTitle = "AI Chat"
+		}
+	}
 
 	return Config{
 		DatabaseURL:     dbURL,
@@ -91,6 +99,16 @@ func Load() (Config, error) {
 		LLMHTTPReferer:  referer,
 		LLMAppTitle:     appTitle,
 	}, nil
+}
+
+func defaultOpenRouterReferer() string {
+	if v := strings.TrimSpace(os.Getenv("VERCEL_URL")); v != "" {
+		if strings.HasPrefix(v, "http://") || strings.HasPrefix(v, "https://") {
+			return v
+		}
+		return "https://" + v
+	}
+	return "http://localhost"
 }
 
 func normalizeModel(model, baseURL string) string {

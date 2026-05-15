@@ -5,7 +5,7 @@ export type MessageSchema = {
   content: string
 }
 
-const messageSchema: yup.ObjectSchema<MessageSchema> = yup.object({
+export const messageSchema: yup.ObjectSchema<MessageSchema> = yup.object({
   content: yup
     .string()
     .trim()

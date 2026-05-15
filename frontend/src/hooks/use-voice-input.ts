@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition"
 
+import { normalizeVoiceText } from "~/lib/normalize-voice-text"
+
 const DEFAULT_LANG = "ru-RU"
 
 function mergeDictation(base: string, transcript: string): string {
@@ -78,10 +80,23 @@ export function useVoiceInput({ value, onChange, language = DEFAULT_LANG }: UseV
     baseTextRef.current = ""
   }, [listening, resetTranscript])
 
+  const finalizeValue = useCallback(async (): Promise<string> => {
+    if (listening) {
+      await SpeechRecognition.stopListening()
+      const merged = normalizeVoiceText(mergeDictation(baseTextRef.current, transcript))
+      onChange(merged)
+      resetTranscript()
+      baseTextRef.current = ""
+      return merged
+    }
+    return normalizeVoiceText(value)
+  }, [listening, onChange, resetTranscript, transcript, value])
+
   return {
     listening,
     toggleListening,
     stopListening,
+    finalizeValue,
     notice,
     supportsSpeechRecognition: browserSupportsSpeechRecognition,
   }

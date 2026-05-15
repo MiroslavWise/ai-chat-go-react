@@ -158,6 +158,9 @@ func aiErrorResponse(err error) (status int, message, details string) {
 		return http.StatusUnauthorized, "invalid AI API key", details
 	case strings.Contains(lower, "model not exist"), strings.Contains(lower, "not found model"):
 		return http.StatusBadRequest, "invalid AI model name", details
+	case strings.Contains(lower, "empty assistant content"):
+		return http.StatusBadGateway, "AI returned an empty response",
+			details + ". For OpenRouter set LLM_HTTP_REFERER to your site URL (e.g. https://ai-chat-go-react.vercel.app) and LLM_APP_TITLE, then redeploy."
 	default:
 		return http.StatusBadGateway, "failed to get AI response", details
 	}

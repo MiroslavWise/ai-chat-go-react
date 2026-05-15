@@ -19,12 +19,12 @@ type ChatMessage struct {
 }
 
 type Client struct {
-	apiKey     string
-	model      string
-	baseURL    string
+	apiKey      string
+	model       string
+	baseURL     string
 	httpReferer string
-	appTitle   string
-	httpClient *http.Client
+	appTitle    string
+	httpClient  *http.Client
 }
 
 func NewClient(apiKey, model, baseURL, httpReferer, appTitle string) *Client {
@@ -53,16 +53,16 @@ type chatCompletionRequest struct {
 }
 
 type chatCompletionResponse struct {
-	Choices []struct {
-		Message struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		} `json:"message"`
-	} `json:"choices"`
-	Error *struct {
+	Choices []chatCompletionChoice `json:"choices"`
+	Error   *struct {
 		Message string `json:"message"`
 		Type    string `json:"type"`
 	} `json:"error,omitempty"`
+}
+
+type chatCompletionChoice struct {
+	Message json.RawMessage `json:"message"`
+	Text    string          `json:"text"`
 }
 
 func (c *Client) ChatCompletion(ctx context.Context, messages []ChatMessage) (string, error) {
@@ -123,11 +123,77 @@ func (c *Client) ChatCompletion(ctx context.Context, messages []ChatMessage) (st
 		return "", fmt.Errorf("%s: empty choices", provider)
 	}
 
-	content := strings.TrimSpace(parsed.Choices[0].Message.Content)
+	content := extractAssistantContent(parsed.Choices)
 	if content == "" {
 		return "", fmt.Errorf("%s: empty assistant content", provider)
 	}
 	return content, nil
+}
+
+func extractAssistantContent(choices []chatCompletionChoice) string {
+	for _, choice := range choices {
+		if content := extractMessageContent(choice.Message); content != "" {
+			return content
+		}
+		if content := strings.TrimSpace(choice.Text); content != "" {
+			return content
+		}
+	}
+	return ""
+}
+
+func extractMessageContent(raw json.RawMessage) string {
+	if len(raw) == 0 {
+		return ""
+	}
+
+	var msg struct {
+		Content          json.RawMessage `json:"content"`
+		Reasoning        string          `json:"reasoning"`
+		ReasoningContent string          `json:"reasoning_content"`
+	}
+	if err := json.Unmarshal(raw, &msg); err != nil {
+		return ""
+	}
+
+	if content := parseContentField(msg.Content); content != "" {
+		return content
+	}
+	if content := strings.TrimSpace(msg.Reasoning); content != "" {
+		return content
+	}
+	return strings.TrimSpace(msg.ReasoningContent)
+}
+
+func parseContentField(raw json.RawMessage) string {
+	if len(raw) == 0 || string(raw) == "null" {
+		return ""
+	}
+
+	var text string
+	if err := json.Unmarshal(raw, &text); err == nil {
+		return strings.TrimSpace(text)
+	}
+
+	var parts []struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	}
+	if err := json.Unmarshal(raw, &parts); err == nil {
+		var b strings.Builder
+		for _, part := range parts {
+			if part.Type != "text" || part.Text == "" {
+				continue
+			}
+			if b.Len() > 0 {
+				b.WriteByte(' ')
+			}
+			b.WriteString(part.Text)
+		}
+		return strings.TrimSpace(b.String())
+	}
+
+	return ""
 }
 
 func providerLabel(baseURL string) string {

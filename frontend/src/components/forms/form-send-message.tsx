@@ -12,14 +12,14 @@ import { useSendMessage } from "~/hooks/use-messages"
 import { useVoiceInput } from "~/hooks/use-voice-input"
 import { useVoiceOutput } from "~/hooks/use-voice-output"
 import { chatTitleFromContent, createChat } from "~/lib/api"
-import { resolverMessage, type MessageSchema } from "~/schemas/message"
+import { messageSchema, resolverMessage, type MessageSchema } from "~/schemas/message"
 
 function FormSendMessage() {
   const [chatId, setChatId] = useQueryState("chatId")
   const queryClient = useQueryClient()
   const sendMessageMutation = useSendMessage()
 
-  const { control, handleSubmit, reset, watch, setValue } = useForm<MessageSchema>({
+  const { control, reset, watch, setValue } = useForm<MessageSchema>({
     resolver: resolverMessage as Resolver<MessageSchema>,
     defaultValues: {
       content: "",
@@ -35,23 +35,32 @@ function FormSendMessage() {
 
   const voiceOutput = useVoiceOutput()
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     if (sendMessageMutation.isPending) return
+
+    const content = await voiceInput.finalizeValue()
+    setValue("content", content, { shouldValidate: true })
+
+    try {
+      await messageSchema.validate({ content })
+    } catch {
+      return
+    }
 
     try {
       if (chatId) {
-        await sendMessageMutation.mutateAsync({ chatId, content: data.content })
+        await sendMessageMutation.mutateAsync({ chatId, content })
       } else {
-        const chat = await createChat(chatTitleFromContent(data.content))
-        await sendMessageMutation.mutateAsync({ chatId: chat.id, content: data.content })
+        const chat = await createChat(chatTitleFromContent(content))
+        await sendMessageMutation.mutateAsync({ chatId: chat.id, content })
         await queryClient.invalidateQueries({ queryKey: queryKeys.chats() })
         setChatId(chat.id)
       }
-      await voiceInput.stopListening()
       voiceOutput.stop()
       reset()
     } catch {}
-  })
+  }
 
   const isLoading = sendMessageMutation.isPending
   const voiceNotice = voiceInput.notice ?? voiceOutput.notice

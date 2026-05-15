@@ -24,7 +24,12 @@ function ListChat() {
 
   return (
     <>
-      <aside className={cn("w-full h-full lg:flex flex-col p-2 gap-1 lg:border-r lg:border-border", isOpen ? "flex" : "hidden lg:flex")}>
+      <aside
+        className={cn(
+          "w-full h-full absolute max-lg:inset-0 lg:relative lg:flex flex-col p-2 gap-1 lg:border-r lg:border-border",
+          isOpen ? "flex" : "hidden lg:flex",
+        )}
+      >
         <Item className="w-full" onClick={() => setChatId(null)} variant="muted" size="sm">
           <span className={cn("text-xs font-medium", chatId === null ? "text-primary" : "text-muted-foreground")}>Новый чат</span>
         </Item>
@@ -35,7 +40,15 @@ function ListChat() {
           </Item>
         ))}
       </aside>
-      <Button variant="outline" size="icon" className="absolute top-2 right-2 lg:hidden z-10" onClick={toggle}>
+      <Button
+        variant="secondary"
+        type="button"
+        aria-label="Открыть меню"
+        title="Открыть меню"
+        size="icon"
+        className="absolute top-2 left-2 z-50 border border-border/80 bg-card text-foreground shadow-lg ring-2 ring-background lg:hidden"
+        onClick={toggle}
+      >
         <Menu className="size-4" />
       </Button>
     </>
