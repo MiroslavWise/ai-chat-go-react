@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -99,7 +100,8 @@ func (h *MessagesHandler) Create(w http.ResponseWriter, r *http.Request) {
 		}
 		assistant, err := h.replyWithAI(r, chat.ID)
 		if err != nil {
-			WriteError(w, http.StatusBadGateway, "failed to get AI response")
+			log.Printf("AI reply failed chat=%s: %v", chat.ID, err)
+			WriteError(w, http.StatusBadGateway, "failed to get AI response", err.Error())
 			return
 		}
 		resp.Assistant = &assistant

@@ -36,8 +36,14 @@ async function request<T>(
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null
-    throw new Error(body?.error ?? `API error: ${response.status}`)
+    const body = (await response.json().catch(() => null)) as {
+      error?: string
+      details?: string
+    } | null
+    const message = body?.details
+      ? `${body.error ?? 'API error'}: ${body.details}`
+      : (body?.error ?? `API error: ${response.status}`)
+    throw new Error(message)
   }
 
   if (response.status === 204) {
