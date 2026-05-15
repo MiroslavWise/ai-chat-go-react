@@ -107,7 +107,7 @@ function FormSendMessage() {
           {sendMessageMutation.error instanceof Error ? sendMessageMutation.error.message : "Не удалось отправить сообщение"}
         </p>
       ) : null}
-      <Button disabled={isLoading} variant="outline" size="icon" type="submit" className="absolute right-4 bottom-4" aria-label="Отправить">
+      <Button disabled={isLoading} variant="outline" type="submit" className="absolute right-4 bottom-4 text-xs" aria-label="Отправить">
         Отправить
       </Button>
     </form>
