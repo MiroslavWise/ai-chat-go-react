@@ -22,17 +22,24 @@ type Client struct {
 	apiKey     string
 	model      string
 	baseURL    string
+	httpReferer string
+	appTitle   string
 	httpClient *http.Client
 }
 
-func NewClient(apiKey, model string) *Client {
+func NewClient(apiKey, model, baseURL, httpReferer, appTitle string) *Client {
 	if model == "" {
 		model = "deepseek-v4-flash"
 	}
+	if baseURL == "" {
+		baseURL = defaultBaseURL
+	}
 	return &Client{
-		apiKey:  apiKey,
-		model:   model,
-		baseURL: defaultBaseURL,
+		apiKey:      apiKey,
+		model:       model,
+		baseURL:     strings.TrimSuffix(baseURL, "/"),
+		httpReferer: httpReferer,
+		appTitle:    appTitle,
 		httpClient: &http.Client{
 			Timeout: 120 * time.Second,
 		},
@@ -79,6 +86,12 @@ func (c *Client) ChatCompletion(ctx context.Context, messages []ChatMessage) (st
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	if c.httpReferer != "" {
+		req.Header.Set("HTTP-Referer", c.httpReferer)
+	}
+	if c.appTitle != "" {
+		req.Header.Set("X-Title", c.appTitle)
+	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -95,23 +108,31 @@ func (c *Client) ChatCompletion(ctx context.Context, messages []ChatMessage) (st
 	if err := json.Unmarshal(raw, &parsed); err != nil {
 		return "", fmt.Errorf("decode response: %w", err)
 	}
+	provider := providerLabel(c.baseURL)
 	if parsed.Error != nil && parsed.Error.Message != "" {
-		return "", fmt.Errorf("deepseek api: %s", parsed.Error.Message)
+		return "", fmt.Errorf("%s: %s", provider, parsed.Error.Message)
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		msg := strings.TrimSpace(string(raw))
 		if msg == "" {
 			msg = resp.Status
 		}
-		return "", fmt.Errorf("deepseek api %d: %s", resp.StatusCode, msg)
+		return "", fmt.Errorf("%s %d: %s", provider, resp.StatusCode, msg)
 	}
 	if len(parsed.Choices) == 0 {
-		return "", fmt.Errorf("deepseek api: empty choices")
+		return "", fmt.Errorf("%s: empty choices", provider)
 	}
 
 	content := strings.TrimSpace(parsed.Choices[0].Message.Content)
 	if content == "" {
-		return "", fmt.Errorf("deepseek api: empty assistant content")
+		return "", fmt.Errorf("%s: empty assistant content", provider)
 	}
 	return content, nil
+}
+
+func providerLabel(baseURL string) string {
+	if strings.Contains(strings.ToLower(baseURL), "openrouter.ai") {
+		return "openrouter"
+	}
+	return "deepseek api"
 }

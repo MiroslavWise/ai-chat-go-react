@@ -81,7 +81,13 @@ func mountAPI(mux *http.ServeMux) error {
 
 	var deepseek *llm.Client
 	if cfg.DeepSeekAPIKey != "" {
-		deepseek = llm.NewClient(cfg.DeepSeekAPIKey, cfg.DeepSeekModel)
+		deepseek = llm.NewClient(
+			cfg.DeepSeekAPIKey,
+			cfg.DeepSeekModel,
+			cfg.DeepSeekBaseURL,
+			cfg.LLMHTTPReferer,
+			cfg.LLMAppTitle,
+		)
 	}
 	messagesHandler := handler.NewMessagesHandler(chatsHandler, st, deepseek, cfg.DeepSeekSystem)
 
